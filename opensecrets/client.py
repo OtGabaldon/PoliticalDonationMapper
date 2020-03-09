@@ -1,30 +1,31 @@
-import requests
 import os
+import requests
 from requests.exceptions import RequestException
-from wrapper.utils import get_base_url, get_cache
-from wrapper.constants import API_FUNCTIONS, state_and_code
+
+from opensecrets.utils import get_base_url, get_cache
+from opensecrets.constants import API_FUNCTIONS, STATE_AND_CODE
 
 class OpenSecretsClient:
-    def __init__(self,output='json'):
+    def __init__(self, output='json'):
         self.base_url = get_base_url()
         self.output = output
         self.legislators = {'num_legislators':0}
         self.contributions = {}
-        self.spinner_states = ['|','/','-','\\']
+        self.spinner_states = ['|', '/', '-', '\\']
 
     def get_all_legislators(self):
         print('Starting to get contributers')
         print('Getting States')
-        for i,(state,state_code) in enumerate(state_and_code):
+        for i, (state, state_code) in enumerate(state_and_code):
             self.get_legislators(state_code)
             os.system('clear')
-            print('{} ... {}% done.'.format((self.spinner_states[i%4]),((i/50)*100)))
+            print('{} ... {}% done.'.format((self.spinner_states[i%4]), ((i/50)*100)))
 
         print("Done.")
 
         return True
-    
-    def get_all_contributions_from_state(self,state):
+
+    def get_all_contributions_from_state(self, state):
         self.get_legislators(state)
 
         num_legislators = self.legislators['num_legislators']
@@ -41,8 +42,8 @@ class OpenSecretsClient:
 
         return True
 
-    def get_legislators(self,state):
-        cached_result = get_cache(self.legislators,[state])
+    def get_legislators(self, state):
+        cached_result = get_cache(self.legislators, [state])
         if cached_result:
             return cached_result
 
@@ -61,15 +62,15 @@ class OpenSecretsClient:
         self.legislators[state] = restructered
         self.legislators['num_legislators'] += len(restructered)
         return restructered
-    
-    def get_candidate_contributions(self,cid,cycle = 2020):
-        cached_contribution = get_cache(self.contributions,[cid,cycle])
+
+    def get_candidate_contributions(self, cid, cycle = 2020):
+        cached_contribution = get_cache(self.contributions, [cid, cycle])
         if cached_contribution:
             return cached_contribution
         if not self.contributions.get(cid):
             self.contributions[cid] = {}
-        
-        response = self.call_open_secrets('get_candidate_contributions',[cid,cycle])
+
+        response = self.call_open_secrets('get_candidate_contributions', [cid, cycle])
 
         if response.get('err'):
             self.contributions[cid]=response['err']
@@ -77,35 +78,35 @@ class OpenSecretsClient:
 
         contributions_data = {}
         contributer_list = response['response']['contributors']['contributor']
-        for i,contributor in enumerate(contributer_list):
+        for i, contributor in enumerate(contributer_list):
             contributer_data = contributor['@attributes']
             contributions_data[contributer_data['org_name']] = contributer_data
 
         self.contributions[cid][cycle] = contributions_data
 
         return contributions_data
-        
-    def build_param_string(self,function,param_values):
+
+    def build_param_string(self, function, param_values):
         '''http://www.opensecrets.org/api//?apikey=123456789 || &method=getLegislators&id=NJ'''
         function_name = function['name']
         param_names = function['params']
-        param_string = '&method={}&output={}'.format(function_name,self.output)
-        for i,param_name in enumerate(param_names):
+        param_string = '&method={}&output={}'.format(function_name, self.output)
+        for i, param_name in enumerate(param_names):
             try:
-                param_string += '&{}={}'.format(param_name,param_values[i])
+                param_string += '&{}={}'.format(param_name, param_values[i])
             except:
-                raise("passed in paramaters are incorrect\n Passed In:{}\n Required:{}".format(param_values,param_names))
+                raise("passed in paramaters are incorrect\n Passed In:{}\n Required:{}".format(param_values, param_names))
 
         return param_string
 
-    def call_open_secrets(self,function_name,params):
+    def call_open_secrets(self, function_name, params):
         function_info = API_FUNCTIONS[function_name]
         param_values = params
-        param_string = self.build_param_string(function_info,param_values)
+        param_string = self.build_param_string(function_info, param_values)
         api_url = self.base_url.format(param_string)
         response = requests.get(api_url)
         print (response.status_code)
         if response.status_code is not requests.codes.ok:
-            return {'err':'Request for {} with paramaters: {} errord with {}'.format(function_name,params,response.status_code)}
+            return {'err':'Request for {} with paramaters: {} errord with {}'.format(function_name, params, response.status_code)}
         return response.json()
-            
+
