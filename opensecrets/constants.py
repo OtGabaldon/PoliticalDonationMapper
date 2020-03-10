@@ -1,13 +1,15 @@
 BASE_URL = 'http://www.opensecrets.org/api/?apikey={}'
 
 API_FUNCTIONS = {
-    'get_legislators' : {'name':'getLegislators', 'params':['id']},
-    'get_candidate_contributions':
-    {
-      'name':'candContrib',
-      'params':['cid', 'cycle']
-      }
+    'get_legislators': {
+        'name': 'getLegislators',
+        'params': ['id']
+    },
+    'get_candidate_contributions': {
+        'name': 'candContrib',
+        'params': ['cid', 'cycle']
     }
+}
 
 STATE_AND_CODE = [
     ('Alabama', 'AL'),
@@ -61,4 +63,3 @@ STATE_AND_CODE = [
     ('Wisconsin', 'WI'),
     ('Wyoming', 'WY')
 ]
-
