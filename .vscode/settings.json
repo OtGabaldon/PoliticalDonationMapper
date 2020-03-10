@@ -1,0 +1,8 @@
+{
+  "files.exclude": {
+    "**/*.pyc": {"when": "$(basename).py"},
+    "**/.pytest_cache": true,
+    "**/__pycache__": true
+  },
+  "python.testing.pytestEnabled": true
+}
