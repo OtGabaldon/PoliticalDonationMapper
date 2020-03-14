@@ -1,0 +1,21 @@
+# This is a SAM template. More info: https://aws.amazon.com/serverless/sam
+# https://github.com/awslabs/serverless-application-model/tree/master/docs
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "AWS CloudFormation stack configuration for PoliticalDonationMapper"
+
+Globals:
+  Function:
+    Runtime: python3.8
+    CodeUri: lambda/
+
+Resources:
+  BasicFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: basic.lambda_handler
+
+Outputs:
+  StackArn:
+    Value: !Ref AWS::StackId

@@ -1,3 +1,7 @@
+# Ignore so devs can keep their own
+samconfig.toml
+
+# Build & test files
 .pytest_cache
 __pycache__
 
